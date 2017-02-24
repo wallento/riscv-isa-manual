@@ -321,10 +321,11 @@ privilege-level ISAs respectively.
 {\footnotesize
 \begin{center}
 \setlength{\tabcolsep}{4pt}
-\begin{tabular}{cKccccc}
+\begin{tabular}{cMcccccc}
 \\
 \instbit{XLEN-1} &
-\instbitrange{XLEN-2}{20} &
+\instbitrange{XLEN-2}{21} &
+\instbit{20} &
 \instbit{19} &
 \instbit{18} &
 \instbit{17} &
@@ -333,13 +334,14 @@ privilege-level ISAs respectively.
 \hline
 \multicolumn{1}{|c|}{SD} &
 \multicolumn{1}{c|}{\wpri} &
+\multicolumn{1}{c|}{TSI} &
 \multicolumn{1}{c|}{MXR} &
 \multicolumn{1}{c|}{PUM} &
 \multicolumn{1}{c|}{MPRV} &
 \multicolumn{1}{c|}{XS[1:0]} &
  \\
 \hline
-1 & XLEN-21 & 1 & 1 & 1 & 2 & \\
+1 & XLEN-20 & 1 & 1 & 1 & 1 & 2 & \\
 \end{tabular}
 \begin{tabular}{ccccccccccccc}
 \\
@@ -483,6 +485,26 @@ accesses to pages that are accessible by U-mode (U=1 in Figure~\ref{sv32pte})
 will fault.  PUM has no effect when page-based virtual memory is not in
 effect.  Note that, while PUM is ordinarily ignored when not executing in
 S-mode, it {\em is} in effect when MPRV=1 and MPP=S.
+
+\subsection{Virtualization Support in {\tt mstatus} Register}
+
+The TSI (Trap Supervisor Instructions) bit supports intercepting certain
+supervisor memory-management and interrupt-handling operations.  When TSI=1,
+attempts to read or write {\tt sptbr} or execute the SFENCE.VMA or WFI
+instructions while executing in S-mode will raise an illegal instruction
+exception.  When TSI=0, these operations are permitted in S-mode.
+
+\begin{commentary}
+The TSI mechanism improves virtualization efficiency by permitting guest
+operating systems to execute in S-mode, rather than classically virtualizing
+them in U-mode.  This approach obviates the need to trap accesses to most
+S-mode CSRs.
+
+Trapping {\tt sptbr} accesses and the SFENCE.VMA instruction provides the
+hooks necessary to lazily populate shadow page tables.  Trapping the WFI
+instruction can trigger a world switch to another guest OS, rather than
+wastefully idling in the current guest.
+\end{commentary}
 
 \subsection{Extension Context Status in {\tt mstatus} Register}
 
