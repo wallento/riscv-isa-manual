@@ -2896,6 +2896,9 @@ to encode the size of the range, as shown in Table~\ref{pmpcfg-napot}.
 \label{pmpcfg-napot}
 \end{table*}
 
+If NAPOT is selected and {\tt pmpaddr} contains no zero (i.e., all
+ones), a PMP violation shall be signaled.
+
 If TOR is selected, the associated address register forms the top of the
 address range, and the preceding PMP address register forms the bottom of the
 address range.  If PMP entry $i$'s A field is set to TOR, the entry matches
